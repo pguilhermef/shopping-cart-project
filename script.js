@@ -81,6 +81,16 @@ const addToCartButton = () => {
   });
 };
 
+const removeAllItems = () => {
+  const itemsOnCart = document.querySelectorAll('.cart__item');
+
+  itemsOnCart
+  .forEach((product) => product.remove());
+};
+
+const buttonToErase = document.querySelector('.empty-cart');
+buttonToErase.addEventListener('click', removeAllItems);
+
 window.onload = async () => {
   await createMenuItems('computador');
   addToCartButton();
