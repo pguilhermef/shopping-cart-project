@@ -24,21 +24,21 @@ const createProductItemElement = ({ sku, name, image }) => {
   return section;
 };
 
-// const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
+const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').innerText;
 
 // const cartItemClickListener = (event) => {
-//   // coloque seu código aqi
+//   // lo
 // };
 
-// const createCartItemElement = ({ sku, name, salePrice }) => {
-//   const li = document.createElement('li');
-//   li.className = 'cart__item';
-//   li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
-//   li.addEventListener('click', cartItemClickListener);
-//   return li;
-// };
+const createCartItemElement = ({ sku, name, salePrice }) => {
+  const li = document.createElement('li');
+  li.className = 'cart__item';
+  li.innerText = `SKU: ${sku} | NAME: ${name} | PRICE: $${salePrice}`;
+  li.addEventListener('click', cartItemClickListener);
+  return li;
+};
 
-const createProductsList = async (product) => {
+const createMenuItems = async (product) => {
   const apiInformation = await fetchProducts(product);
   const { results } = apiInformation;
   const itemsClass = document.querySelector('.items');
@@ -55,6 +55,33 @@ const createProductsList = async (product) => {
     });
 };
 
-createProductsList('mouse');
+const addItemToCart = async ({ target }) => {
+  const product = target.parentNode;
+  const idOfProduct = getSkuFromProductItem(product);
+  const apiInformation = await fetchItem(idOfProduct);
+  const { id, title, price } = apiInformation;
 
-window.onload = () => { };
+  const cartItems = document.querySelector('.cart__items');
+
+  const objectFormatation = {
+    sku: id, 
+    name: title, 
+    salePrice: price,
+  };
+
+  cartItems.appendChild(createCartItemElement(objectFormatation));
+};
+
+const addToCartButton = () => {
+  const button = document.querySelectorAll('.item__add');
+
+  button
+  .forEach((product) => {
+    product.addEventListener('click', addItemToCart);
+  });
+};
+
+window.onload = async () => {
+  await createMenuItems('computador');
+  addToCartButton();
+};
