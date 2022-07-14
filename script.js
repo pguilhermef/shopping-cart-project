@@ -1,3 +1,5 @@
+const cartItems = document.querySelector('.cart__items');
+
 const createProductImageElement = (imageSource) => {
   const img = document.createElement('img');
   img.className = 'item__image';
@@ -28,6 +30,8 @@ const getSkuFromProductItem = (item) => item.querySelector('span.item__sku').inn
 
 const cartItemClickListener = ({ target }) => {
   target.remove();
+  // Dica do Roberto Baez - T23B
+  saveCartItems(cartItems.innerHTML);
 };
 
 const createCartItemElement = ({ sku, name, salePrice }) => {
@@ -59,17 +63,17 @@ const addItemToCart = async ({ target }) => {
   const product = target.parentNode;
   const idOfProduct = getSkuFromProductItem(product);
   const apiInformation = await fetchItem(idOfProduct);
-  const { id, title, price } = apiInformation;
-
-  const cartItems = document.querySelector('.cart__items');
+  const { id, title, thumbnail, price } = apiInformation;
 
   const objectFormatation = {
     sku: id, 
     name: title, 
+    image: thumbnail,
     salePrice: price,
   };
 
   cartItems.appendChild(createCartItemElement(objectFormatation));
+  saveCartItems(cartItems.innerHTML);
 };
 
 const addToCartButton = () => {
@@ -81,17 +85,24 @@ const addToCartButton = () => {
   });
 };
 
-const removeAllItems = () => {
-  const itemsOnCart = document.querySelectorAll('.cart__item');
-
-  itemsOnCart
-  .forEach((product) => product.remove());
+// Ajuda do Jensen na Mentoria
+const toAllowRemoveItensAfterRefresh = () => {
+  const cartItem = cartItems.childNodes;
+  cartItem.forEach((item) => item.addEventListener('click', cartItemClickListener));
 };
 
-const buttonToErase = document.querySelector('.empty-cart');
-buttonToErase.addEventListener('click', removeAllItems);
+const removeAllItems = () => {
+  const removeAll = document.querySelector('.empty-cart');
+  removeAll.addEventListener('click', () => {
+    cartItems.innerHTML = '';
+    saveCartItems(cartItems.innerHTML);
+  });
+};
 
 window.onload = async () => {
   await createMenuItems('computador');
   addToCartButton();
+  cartItems.innerHTML = getSavedCartItems('cartItems');
+  toAllowRemoveItensAfterRefresh();
+  removeAllItems();
 };
